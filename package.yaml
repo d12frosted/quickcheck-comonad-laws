@@ -1,0 +1,43 @@
+name:                quickcheck-comonad-laws
+version:             1.0.0.0
+github:              "d12frosted/quickcheck-comonad-laws"
+license:             BSD3
+author:              "Boris Buliga"
+maintainer:          "boris@d12frosted.io"
+copyright:           "2020 Boris Buliga"
+
+extra-source-files:
+- README.org
+- ChangeLog.org
+
+# Metadata used when publishing your package
+synopsis:            Comonad laws checks for Tasty and QuickCheck
+category:            testing, tasty, quickcheck
+
+# To avoid duplicated efforts in documentation and dealing with the
+# complications of embedding Haddock markup inside cabal files, it is
+# common to point users to the README.md file.
+description:         Please see the README on GitHub at <https://github.com/d12frosted/quickcheck-comonad-laws#readme>
+
+dependencies:
+- base >= 4.7 && < 5
+- tasty >= 1.2 && < 1.3
+- tasty-quickcheck >= 0.10 && < 0.11
+- comonad >= 5 && < 6
+
+ghc-options:
+  - -Wall
+
+library:
+  source-dirs: src
+
+tests:
+  quickcheck-comonad-laws-test:
+    main:                Main.hs
+    source-dirs:         test
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - quickcheck-comonad-laws

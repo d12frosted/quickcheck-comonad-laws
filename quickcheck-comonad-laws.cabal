@@ -1,0 +1,59 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.33.0.
+--
+-- see: https://github.com/sol/hpack
+--
+-- hash: bac6924e2cf76bb3a0ee4c7f091d41d88106145e741e138706de2cf26c071667
+
+name:           quickcheck-comonad-laws
+version:        1.0.0.0
+synopsis:       Comonad laws checks for Tasty and QuickCheck
+description:    Please see the README on GitHub at <https://github.com/d12frosted/quickcheck-comonad-laws#readme>
+category:       testing, tasty, quickcheck
+homepage:       https://github.com/d12frosted/quickcheck-comonad-laws#readme
+bug-reports:    https://github.com/d12frosted/quickcheck-comonad-laws/issues
+author:         Boris Buliga
+maintainer:     boris@d12frosted.io
+copyright:      2020 Boris Buliga
+license:        BSD3
+license-file:   LICENSE
+build-type:     Simple
+extra-source-files:
+    README.org
+    ChangeLog.org
+
+source-repository head
+  type: git
+  location: https://github.com/d12frosted/quickcheck-comonad-laws
+
+library
+  exposed-modules:
+      Test.Tasty.QuickCheck.Laws.Comonad
+  other-modules:
+      Paths_quickcheck_comonad_laws
+  hs-source-dirs:
+      src
+  ghc-options: -Wall
+  build-depends:
+      base >=4.7 && <5
+    , comonad >=5 && <6
+    , tasty >=1.2 && <1.3
+    , tasty-quickcheck >=0.10 && <0.11
+  default-language: Haskell2010
+
+test-suite quickcheck-comonad-laws-test
+  type: exitcode-stdio-1.0
+  main-is: Main.hs
+  other-modules:
+      Paths_quickcheck_comonad_laws
+  hs-source-dirs:
+      test
+  ghc-options: -Wall -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      base >=4.7 && <5
+    , comonad >=5 && <6
+    , quickcheck-comonad-laws
+    , tasty >=1.2 && <1.3
+    , tasty-quickcheck >=0.10 && <0.11
+  default-language: Haskell2010

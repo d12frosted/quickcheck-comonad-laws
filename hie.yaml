@@ -1,0 +1,7 @@
+cradle:
+  stack:
+    - path: "./src"
+      component: "quickcheck-comonad-laws:lib"
+
+    - path: "./test"
+      component: "quickcheck-comonad-laws:test:quickcheck-comonad-laws-test"
