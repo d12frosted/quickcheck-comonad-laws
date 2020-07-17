@@ -34,32 +34,32 @@ import Text.Show.Functions ()
 
 --------------------------------------------------------------------------------
 
--- | Constructs a @TestTree@ checking that the @Comonad@ class laws hold for @m@
+-- | Constructs a @TestTree@ checking that the @Comonad@ class laws hold for @w@
 -- with value types @a@, @b@, and @c@, using a given equality test for values of
--- type @forall u. m u@. The equality context type @t@ is for constructors @m@
--- from which we can only extract a value within a context, such as reader-like
--- constructors.
+-- type @forall u. w u@ and @forall u. u@. The equality context type @t@ is for
+-- constructors @m@ from which we can only extract a value within a context,
+-- such as reader-like constructors.
 testComonadLaws ::
-  ( Comonad m,
+  ( Comonad w,
     Eq a,
     Eq b,
     Eq c,
     Show t,
-    Show (m a),
+    Show (w a),
     Arbitrary t,
-    Arbitrary (m a),
+    Arbitrary (w a),
     Arbitrary b,
     Arbitrary c,
-    CoArbitrary (m a),
-    CoArbitrary (m b),
-    Typeable m,
+    CoArbitrary (w a),
+    CoArbitrary (w b),
+    Typeable w,
     Typeable a,
     Typeable b,
     Typeable c
   ) =>
   -- | Type constructor under test
-  Proxy m ->
-  -- | Equality context for @m@
+  Proxy w ->
+  -- | Equality context for @w@
   Proxy t ->
   -- | Value type
   Proxy a ->
@@ -68,13 +68,13 @@ testComonadLaws ::
   -- | Value type
   Proxy c ->
   -- | Equality test
-  (forall u. (Eq u) => t -> m u -> m u -> Bool) ->
+  (forall u. (Eq u) => t -> w u -> w u -> Bool) ->
   -- | Equality test
   (forall u. (Eq u) => t -> u -> u -> Bool) ->
   TestTree
-testComonadLaws pm pt pa pb pc eq eq0 =
+testComonadLaws pw pt pa pb pc eq eq0 =
   let label =
-        "Comonad Laws for " ++ show (typeRep pm) ++ " with "
+        "Comonad Laws for " ++ show (typeRep pw) ++ " with "
           ++ "a :: "
           ++ show (typeRep pa)
           ++ ", "
@@ -85,46 +85,46 @@ testComonadLaws pm pt pa pb pc eq eq0 =
           ++ show (typeRep pc)
    in testGroup
         label
-        [ testComonadLawRightIdentity pm pt pa eq,
-          testComonadLawLeftIdentity pm pt pa pb eq0,
-          testComonadLawAssociativity pm pt pa pb pc eq
+        [ testComonadLawRightIdentity pw pt pa eq,
+          testComonadLawLeftIdentity pw pt pa pb eq0,
+          testComonadLawAssociativity pw pt pa pb pc eq
         ]
 
 --------------------------------------------------------------------------------
 
 -- | @extend extract === id@
 testComonadLawRightIdentity ::
-  ( Comonad m,
+  ( Comonad w,
     Eq a,
     Show t,
-    Show (m a),
+    Show (w a),
     Arbitrary t,
-    Arbitrary (m a)
+    Arbitrary (w a)
   ) =>
   -- | Type constructor under test
-  Proxy m ->
-  -- | Equality context for @m@
+  Proxy w ->
+  -- | Equality context for @w@
   Proxy t ->
   -- | Value type
   Proxy a ->
   -- | Equality test
-  (forall u. (Eq u) => t -> m u -> m u -> Bool) ->
+  (forall u. (Eq u) => t -> w u -> w u -> Bool) ->
   TestTree
-testComonadLawRightIdentity pm pt pa eq =
-  testProperty "extend extract === id" $ comonadLawRightIdentity pm pt pa eq
+testComonadLawRightIdentity pw pt pa eq =
+  testProperty "extend extract === id" $ comonadLawRightIdentity pw pt pa eq
 
 comonadLawRightIdentity ::
-  (Comonad m, Eq a) =>
+  (Comonad w, Eq a) =>
   -- | Type constructor under test
-  Proxy m ->
-  -- | Equality context for @m@
+  Proxy w ->
+  -- | Equality context for @w@
   Proxy t ->
   -- | Value type
   Proxy a ->
   -- | Equality test
-  (forall u. (Eq u) => t -> m u -> m u -> Bool) ->
+  (forall u. (Eq u) => t -> w u -> w u -> Bool) ->
   t ->
-  m a ->
+  w a ->
   Bool
 comonadLawRightIdentity _ _ _ eq t x = eq t (extend extract x) x
 
@@ -132,18 +132,18 @@ comonadLawRightIdentity _ _ _ eq t x = eq t (extend extract x) x
 
 -- | @extract . extend f === f@
 testComonadLawLeftIdentity ::
-  ( Comonad m,
+  ( Comonad w,
     Eq b,
     Show t,
-    Show (m a),
+    Show (w a),
     Arbitrary t,
-    Arbitrary (m a),
+    Arbitrary (w a),
     Arbitrary b,
-    CoArbitrary (m a)
+    CoArbitrary (w a)
   ) =>
   -- | Type constructor under test
-  Proxy m ->
-  -- | Equality context for @m@
+  Proxy w ->
+  -- | Equality context for @w@
   Proxy t ->
   -- | Value type
   Proxy a ->
@@ -152,14 +152,14 @@ testComonadLawLeftIdentity ::
   -- | Equality test
   (forall u. (Eq u) => t -> u -> u -> Bool) ->
   TestTree
-testComonadLawLeftIdentity pm pt pa pb eq =
-  testProperty "extract . extend f === f" $ comonadLawLeftIdentity pm pt pa pb eq
+testComonadLawLeftIdentity pw pt pa pb eq =
+  testProperty "extract . extend f === f" $ comonadLawLeftIdentity pw pt pa pb eq
 
 comonadLawLeftIdentity ::
-  (Comonad m, Eq b) =>
+  (Comonad w, Eq b) =>
   -- | Type constructor under test
-  Proxy m ->
-  -- | Equality context for @m@
+  Proxy w ->
+  -- | Equality context for @w@
   Proxy t ->
   -- | Value type
   Proxy a ->
@@ -168,30 +168,29 @@ comonadLawLeftIdentity ::
   -- | Equality test
   (forall u. (Eq u) => t -> u -> u -> Bool) ->
   t ->
-  m a ->
-  (m a -> b) ->
+  w a ->
+  (w a -> b) ->
   Bool
 comonadLawLeftIdentity _ _ _ _ eq t x f = eq t (extract . extend f $ x) (f x)
 
 --------------------------------------------------------------------------------
---
 
 -- | @extend f . extend g = extend (f . extend g)@
 testComonadLawAssociativity ::
-  ( Comonad m,
+  ( Comonad w,
     Eq c,
     Show t,
-    Show (m a),
+    Show (w a),
     Arbitrary t,
-    Arbitrary (m a),
+    Arbitrary (w a),
     Arbitrary b,
     Arbitrary c,
-    CoArbitrary (m a),
-    CoArbitrary (m b)
+    CoArbitrary (w a),
+    CoArbitrary (w b)
   ) =>
   -- | Type constructor under test
-  Proxy m ->
-  -- | Equality context for @m@
+  Proxy w ->
+  -- | Equality context for @w@
   Proxy t ->
   -- | Value type
   Proxy a ->
@@ -200,26 +199,26 @@ testComonadLawAssociativity ::
   -- | Value type
   Proxy c ->
   -- | Equality test
-  (forall u. (Eq u) => t -> m u -> m u -> Bool) ->
+  (forall u. (Eq u) => t -> w u -> w u -> Bool) ->
   TestTree
-testComonadLawAssociativity pm pt pa pb pc eq =
+testComonadLawAssociativity pw pt pa pb pc eq =
   testProperty "extend f . extend g = extend (f . extend g)" $
-    comonadLawAssociativity pm pt pa pb pc eq
+    comonadLawAssociativity pw pt pa pb pc eq
 
 comonadLawAssociativity ::
-  ( Comonad m,
+  ( Comonad w,
     Eq c
   ) =>
-  Proxy m ->
+  Proxy w ->
   Proxy t ->
   Proxy a ->
   Proxy b ->
   Proxy c ->
-  (forall u. (Eq u) => t -> m u -> m u -> Bool) ->
+  (forall u. (Eq u) => t -> w u -> w u -> Bool) ->
   t ->
-  m a ->
-  (m b -> c) ->
-  (m a -> b) ->
+  w a ->
+  (w b -> c) ->
+  (w a -> b) ->
   Bool
 comonadLawAssociativity _ _ _ _ _ eq t x f g =
   eq t (extend f . extend g $ x) (extend (f . extend g) x)
