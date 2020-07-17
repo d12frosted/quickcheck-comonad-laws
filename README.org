@@ -1,3 +1,15 @@
 * quickcheck-comonad-laws
 
 Provides =TestTree= of [[https://hackage.haskell.org/package/comonad][Comonad]] laws for [[https://hackage.haskell.org/package/tasty][Tasty]] framework.
+
+** Install with =stack=
+
+Just add =quickcheck-comonad-laws= to =stack.yaml= file.
+
+#+begin_src yaml
+  extra-deps:
+  - git: https://github.com/d12frosted/quickcheck-comonad-laws
+    commit: c4fe532c26c3339df6d5afbef35e6946ab185a98
+#+end_src
+
+And then add =quickcheck-comonad-laws= to your test target as dependency.
